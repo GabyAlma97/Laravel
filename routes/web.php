@@ -22,4 +22,5 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::resource('home','App\Http\Controllers\TasksController');
 Route::resource('Datos','App\Http\Controllers\TasksController');
-
+Route::get('home', 'App\Http\Controllers\TasksController@bar'); 
+Route::resource('home', 'App\Http\Controllers\TasksController'); 

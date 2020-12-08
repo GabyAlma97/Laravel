@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\tasks;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -18,6 +18,10 @@ class TasksController extends Controller
     {
        $datos['ds']=tasks::all();
         return view('home', $datos);
+    }
+    public function bar($id)
+    {
+        return view('Datos.index');
     }
 
     /**
@@ -39,16 +43,23 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-        $tasks = new  tasks();
+        request() ->validate(
+        [ 'title' => 'required',
+          'description' => 'required',
+          'status' => 'required',
+          'priority' => 'required',
+            ]);
+            
+            $tasks = new  tasks();
             $tasks->title = $request->title;
             $tasks->description = $request->description;
             $tasks->status= $request->status;
             $tasks->priority= $request->priority;
             $tasks->fecha = Carbon::now();
-            $tasks->responsable_id = 1;
-            $tasks->created_by_id = 1;
+            $tasks->responsable_id = auth()->id();
+            $tasks->created_by_id = auth()->id();
             $tasks->save();
-             return back()->with('mensaje', 'Nota agregada');
+            return redirect('/home');    
         
     }
 
@@ -58,19 +69,11 @@ class TasksController extends Controller
      * @param  \App\Models\tasks  $tasks
      * @return \Illuminate\Http\Response
      */
-    public function show(tasks $tasks)
+    public function show()
     {
-        $tasks = new  tasks();
-            $tasks->title = "Mi primer libro";
-            $tasks->description = "Extracto de mi primer libro";
-            $tasks->status= "<p>Resumen de mi primer libro</p>";
-            $tasks->priority= "<p>Resumen de mi primer libro</p>";
-            $tasks->fecha = Carbon::now();
-            $tasks->responsable_id = 1;
-            $tasks->created_by_id = 1;
-            $tasks->save();
+        return view('Datos.from');
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -83,6 +86,7 @@ class TasksController extends Controller
         return view('Datos.edit',compact('datos'));
       
     }
+   
 
     /**
      * Update the specified resource in storage.
@@ -93,6 +97,12 @@ class TasksController extends Controller
      */
     public function update(Request $request, $id)
     {
+        request() ->validate(
+            [ 'title' => 'required',
+              'description' => 'required',
+              'status' => 'required',
+              'priority' => 'required',
+                ]);
         $datos= tasks::findOrFail($id);
         $datos->title = $request->title;
         $datos->description = $request->description;
@@ -100,9 +110,9 @@ class TasksController extends Controller
         $datos->priority= $request->priority;
         $datos->fecha = Carbon::now();
         $datos->responsable_id = 1;
-        $datos->created_by_id = 1;
+        $datos->created_by_id =1;
         $datos->save();
-        return back()->with('mensaje', 'Nota agregada');
+        return redirect('/home'); 
     }
 
     /**
@@ -117,4 +127,5 @@ class TasksController extends Controller
     
         return back()->with('mensaje', 'Nota Eliminada');
     }
+
 }
